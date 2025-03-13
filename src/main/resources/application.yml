@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: 2025 Swiss Confederation
+#
+# SPDX-License-Identifier: MIT
+
+jeap:
+  monitor:
+    prometheus:
+      # The current RHOS setup requires MONITORING_BASIC_AUTH_PASSWORD to be cleartext.
+      # This way MaaS can pick it up from the vault and use it in its request.
+      password: "{noop}${MONITORING_BASIC_AUTH_PASSWORD}"
+      user: "${MONITORING_BASIC_AUTH_USERNAME}"
+  swagger:
+    status: OPEN
+  rest:
+    tracing:
+      uri-filter-pattern: .*/actuator/.*
+      full-response-details-in-message: false
+
+  # Security config nOTE: OAuth issuer can be configured via the following env variables:
+  #  - JEAP_SECURITY_OAUTH2_RESOURCESERVER_AUTHORIZATION-SERVER_ISSUER (default)
+  #  - JEAP_SECURITY_OAUTH2_RESOURCESERVER_AUTH-SERVERS_0_ISSUER (addtional can be added with index)
+
+spring:
+  application:
+    name: swiyu-registry-identifier-authoring-service
+  jpa:
+    properties:
+      hibernate:
+        default_schema: "data"
+        ddl-auto: validate
+    open-in-view: false
+  flyway:
+    locations: classpath:db/migration/common
+    default-schema: ${spring.jpa.properties.hibernate.default_schema}
+  datasource:
+    hikari:
+      schema: ${spring.jpa.properties.hibernate.default_schema}
+
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: ${spring.application.name}
+    try-it-out-enabled: true
+
+logging:
+  level:
+    ch.admin.bit.jeap: INFO
+    ch.admin.bit.jeap.log.RestRequestTracer: DEBUG
+    ch.admin.bj.swiyu: INFO
+
+did-authoring:
+  didTdwRouteTemplate: "${DID_AUTHORING_DID_TDW_ROUTE_TEMPLATE}"
+  didWebTemplate: "${DID_AUTHORING_DID_WEB_TEMPLATE}"

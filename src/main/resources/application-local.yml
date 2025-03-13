@@ -1,0 +1,44 @@
+# SPDX-FileCopyrightText: 2025 Swiss Confederation
+#
+# SPDX-License-Identifier: MIT
+
+server:
+  port: 8180
+
+jeap:
+  monitor:
+    prometheus:
+      password: "{noop}prometheus"
+      user: "prometheus"
+  security:
+    oauth2:
+      resourceserver:
+        authorization-server:
+          issuer: https://auth-d.trust-infra.swiyu.admin.ch/realms/bj-swiyu-ecosystem
+        auth-servers: # Additional authorization servers
+          - issuer: https://auth-r.trust-infra.swiyu.admin.ch/realms/bj-swiyu-ecosystem-portal-scs
+
+spring:
+  datasource:
+    url: "jdbc:postgresql://localhost:5180/identifier-registry-db"
+    username: "postgres"
+    password: "secret"
+  docker:
+    compose:
+      enabled: true
+      file: compose.yaml
+
+logging:
+  level:
+    ch.admin.bit.jeap: DEBUG
+    ch.admin.bj.swiyu: DEBUG
+
+management:
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+
+did-authoring:
+  didTdwRouteTemplate: "http://localhost:8190/api/v1/did/{0}"
+  didWebTemplate: "did:web:localhost%3A8190:api:v1:did:{0}"
