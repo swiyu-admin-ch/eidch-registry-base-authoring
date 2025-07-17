@@ -21,7 +21,7 @@ write-rights.
   - [Usage](#usage)
     - [Auth](#auth)
       - [OAuth configuration](#oauth-configuration)
-  - [Known Issues](#known-issues)
+  - [Missing Features and Known Issues](#missing-features-and-known-issues)
   - [Contributions and feedback](#contributions-and-feedback)
   - [License](#license)
 
@@ -101,9 +101,9 @@ To configure the basic auth capabilities please use the following environment va
 | MONITORING_BASIC_AUTH_USERNAME | String  | Defines the password used during the basic auth validation. |
 | MONITORING_BASIC_AUTH_PASSWORD | String  | Defines the password used during the basic auth validation. |
 
-## Known Issues
+## Missing Features and Known Issues
 
-The swiyu Public Beta Trust Infrastructure was deliberately released at an early stage to enable future ecosystem participants. There may still be minor bugs or security vulnerabilities in the test system. We will publish them in the near future as ‘KnownIssues’ in this repository.
+The swiyu Public Beta Trust Infrastructure was deliberately released at an early stage to enable future ecosystem participants. The [feature roadmap](https://github.com/orgs/swiyu-admin-ch/projects/1/views/7) shows the current discrepancies between Public Beta and the targeted productive Trust Infrastructure. There may still be minor bugs or security vulnerabilities in the test system. These are marked as [‘KnownIssues’](../../issues) in each repository.
 
 ## Contributions and feedback
 
