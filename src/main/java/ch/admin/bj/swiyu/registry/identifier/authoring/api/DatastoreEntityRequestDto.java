@@ -6,15 +6,20 @@
 
 package ch.admin.bj.swiyu.registry.identifier.authoring.api;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(name = "DatastoreEntityRequest")
-public record DatastoreEntityRequestDto(DatastoreStatusDto status) {
+public class DatastoreEntityRequestDto {
 
-    @JsonIgnore
+    private DatastoreStatusDto status;
+
     public Optional<DatastoreStatusDto> getStatus() {
         return Optional.ofNullable(status);
     }

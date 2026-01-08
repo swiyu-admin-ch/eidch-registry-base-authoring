@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 
 @Schema(name = "ApiError")
 public record ApiErrorDto(HttpStatus status, String message) {
-
     public ApiErrorDto(HttpStatus status) {
         this(status, status.getReasonPhrase());
     }

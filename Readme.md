@@ -15,15 +15,14 @@ write-rights.
 ## Table of Contents
 
 - [Datastore Services and Libraries](#datastore-services-and-libraries)
-  - [Table of Contents](#table-of-contents)
-  - [Overview](#overview)
-  - [Installation](#installation)
-  - [Usage](#usage)
-    - [Auth](#auth)
-      - [OAuth configuration](#oauth-configuration)
-  - [Missing Features and Known Issues](#missing-features-and-known-issues)
-  - [Contributions and feedback](#contributions-and-feedback)
-  - [License](#license)
+    - [Table of Contents](#table-of-contents)
+    - [Overview](#overview)
+    - [Installation](#installation)
+    - [Usage](#usage)
+        - [Auth](#auth)
+            - [OAuth configuration](#oauth-configuration)
+    - [Contributions and feedback](#contributions-and-feedback)
+    - [License](#license)
 
 ## Overview
 
@@ -53,13 +52,19 @@ In order to start the service locally, run:
 docker compose up
 ```
 
-Then run:
+To run the application local execute:
 
 ```shell
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
 The openapi definition can then be found [here](http://localhost:8180/swagger-ui.html)
+
+Note: if you want to run the application alongside with the other services of SWIYU, you can run
+
+```shell
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local,shared
+```
 
 ## Usage
 
@@ -96,14 +101,10 @@ Currently, it is only possible to use the basic auth capabilities on the `/actua
 
 To configure the basic auth capabilities please use the following environment variables:
 
-| Name                           | Type    | Description                                                 |
-| ------------------------------ | ------- | ----------------------------------------------------------- |
-| MONITORING_BASIC_AUTH_USERNAME | String  | Defines the password used during the basic auth validation. |
-| MONITORING_BASIC_AUTH_PASSWORD | String  | Defines the password used during the basic auth validation. |
-
-## Missing Features and Known Issues
-
-The swiyu Public Beta Trust Infrastructure was deliberately released at an early stage to enable future ecosystem participants. The [feature roadmap](https://github.com/orgs/swiyu-admin-ch/projects/1/views/7) shows the current discrepancies between Public Beta and the targeted productive Trust Infrastructure. There may still be minor bugs or security vulnerabilities in the test system. These are marked as [‘KnownIssues’](../../issues) in each repository.
+| Name                           | Type   | Description                                                 |
+|--------------------------------|--------|-------------------------------------------------------------|
+| MONITORING_BASIC_AUTH_USERNAME | String | Defines the password used during the basic auth validation. |
+| MONITORING_BASIC_AUTH_PASSWORD | String | Defines the password used during the basic auth validation. |
 
 ## Contributions and feedback
 

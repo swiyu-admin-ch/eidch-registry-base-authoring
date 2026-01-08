@@ -13,5 +13,5 @@ public enum DatastoreStatusDto {
     ACTIVE,
     DEACTIVATED,
     DISABLED,
-    SETUP
+    SETUP,
 }

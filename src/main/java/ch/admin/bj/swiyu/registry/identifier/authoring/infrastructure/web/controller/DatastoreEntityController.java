@@ -18,11 +18,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/entry")
@@ -35,18 +34,18 @@ public class DatastoreEntityController {
     @Timed
     @GetMapping(value = "/{id}")
     @Operation(
-            summary = "Get an entry configuration from the Datastore.",
-            description = "Get an entry configuration from the Datastore."
+        summary = "IF-004.001 - Get an entry configuration from the Datastore.",
+        description = "Get an entry configuration from the Datastore."
     )
     @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found",
-                            content = @Content(schema = @Schema(implementation = ApiErrorDto.class))
-                    ),
-            }
+        value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(
+                responseCode = "404",
+                description = "Not Found",
+                content = @Content(schema = @Schema(implementation = ApiErrorDto.class))
+            ),
+        }
     )
     public DatastoreEntityResponseDto getDatastoreEntry(@Valid @PathVariable(name = "id") UUID id) {
         return didEntityService.getDatastoreEntity(id);
@@ -54,33 +53,36 @@ public class DatastoreEntityController {
 
     @Timed
     @PostMapping(value = "/")
-    @Operation(summary = "Create a new entry in the Datastore.", description = "Create a new entry in the Datastore.")
-    @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Success", useReturnTypeSchema = true)})
+    @Operation(
+        summary = "IF-004.002 - Create a new entry in the Datastore.",
+        description = "Create a new entry in the Datastore."
+    )
+    @ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Success", useReturnTypeSchema = true) })
     @ResponseStatus(HttpStatus.CREATED)
     public DatastoreEntityResponseDto createDatastoreEntry() {
         return this.didEntityService.createDatastoreEntity();
     }
 
     @Timed
-    @PatchMapping(value = "/{id}")
+    @PatchMapping(value = "/{datastoreEntryId}")
     @Operation(
-            summary = "Update an entry configuration from the Datastore.",
-            description = "Update an entry configuration from the Datastore."
+        summary = "IF-004.003 - Update an entry configuration from the Datastore.",
+        description = "Update an entry configuration from the Datastore."
     )
     @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Not Found",
-                            content = @Content(schema = @Schema(implementation = ApiErrorDto.class))
-                    ),
-            }
+        value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(
+                responseCode = "404",
+                description = "Not Found",
+                content = @Content(schema = @Schema(implementation = ApiErrorDto.class))
+            ),
+        }
     )
     public DatastoreEntityResponseDto updateDatastoreEntry(
-            @Valid @PathVariable(name = "id") UUID id,
-            @RequestBody DatastoreEntityRequestDto body
+        @Valid @PathVariable(name = "datastoreEntryId") UUID datastoreEntryId,
+        @RequestBody DatastoreEntityRequestDto body
     ) {
-        return didEntityService.updateDatastoreEntity(id, body);
+        return didEntityService.updateDatastoreEntity(datastoreEntryId, body);
     }
 }

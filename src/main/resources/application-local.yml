@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 server:
-  port: 8180
+  port: 8180 # dedicated within swiyu to avoid conflicts
 
 jeap:
   monitor:
@@ -13,10 +13,13 @@ jeap:
   security:
     oauth2:
       resourceserver:
+        resource-id: bj-swiyu-ecosystem-portal-scs # Resource ID of the application as it is configured in oauth servers
         authorization-server:
-          issuer: https://auth-d.trust-infra.swiyu.admin.ch/realms/bj-swiyu-ecosystem
+          issuer: https://swiyu-oauth-mock-server-d.apps.p-szb-ros-shrd-npr-01.cloud.admin.ch
         auth-servers: # Additional authorization servers
+          - issuer: https://auth-d.trust-infra.swiyu.admin.ch/realms/bj-swiyu-ecosystem
           - issuer: https://auth-r.trust-infra.swiyu.admin.ch/realms/bj-swiyu-ecosystem-portal-scs
+          - issuer: http://localhost:8480 # mock server started locally
 
 spring:
   datasource:
@@ -27,6 +30,11 @@ spring:
     compose:
       enabled: true
       file: compose.yaml
+
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: ${jeap.security.oauth2.resourceserver.resource-id}
 
 logging:
   level:

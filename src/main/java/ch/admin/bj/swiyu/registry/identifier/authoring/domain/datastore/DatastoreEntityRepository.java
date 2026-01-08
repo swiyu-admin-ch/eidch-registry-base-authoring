@@ -6,9 +6,7 @@
 
 package ch.admin.bj.swiyu.registry.identifier.authoring.domain.datastore;
 
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.UUID;
-
-public interface DatastoreEntityRepository extends JpaRepository<DatastoreEntity, UUID> {
-}
+public interface DatastoreEntityRepository extends JpaRepository<DatastoreEntity, UUID> {}

@@ -6,19 +6,18 @@
 
 package ch.admin.bj.swiyu.registry.identifier.authoring.service;
 
+import static ch.admin.bj.swiyu.registry.identifier.authoring.service.mapper.EnumMapper.mapEnum;
+
 import ch.admin.bj.swiyu.registry.identifier.authoring.api.DatastoreEntityRequestDto;
 import ch.admin.bj.swiyu.registry.identifier.authoring.common.exception.ResourceNotFoundException;
 import ch.admin.bj.swiyu.registry.identifier.authoring.common.exception.ResourceNotReadyException;
 import ch.admin.bj.swiyu.registry.identifier.authoring.domain.datastore.DatastoreEntity;
 import ch.admin.bj.swiyu.registry.identifier.authoring.domain.datastore.DatastoreEntityRepository;
 import ch.admin.bj.swiyu.registry.identifier.authoring.domain.datastore.DatastoreStatus;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
-
-import static ch.admin.bj.swiyu.registry.identifier.authoring.service.mapper.EnumMapper.mapEnum;
 
 /**
  * Internal (not public) Domain Service for accessing DatastoreEntity directly.
@@ -31,8 +30,8 @@ class DatastoreEntityService {
 
     public static void validateCanEdit(DatastoreEntity entry) throws ResourceNotReadyException {
         if (entry.getStatus() == DatastoreStatus.DISABLED) throw new ResourceNotReadyException(
-                entry.getId().toString(),
-                DatastoreEntity.class
+            entry.getId().toString(),
+            DatastoreEntity.class
         );
     }
 
@@ -40,7 +39,7 @@ class DatastoreEntityService {
     public DatastoreEntity getDatastoreEntity(UUID id) {
         return this.datastoreEntityRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException(id.toString(), DatastoreEntity.class)
-        );
+            );
     }
 
     @Transactional
@@ -51,8 +50,9 @@ class DatastoreEntityService {
     @Transactional
     public void updateDatastoreEntity(UUID id, DatastoreEntityRequestDto request) {
         DatastoreEntity entity = this.getDatastoreEntity(id);
-        if (request.getStatus().isPresent()) {
-            var newStatus = mapEnum(DatastoreStatus.class, request.getStatus().get());
+        var status = request.getStatus();
+        if (status.isPresent()) {
+            var newStatus = mapEnum(DatastoreStatus.class, status.get());
             entity.changeStatus(newStatus);
         }
         this.datastoreEntityRepository.save(entity);

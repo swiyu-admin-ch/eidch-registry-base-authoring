@@ -26,22 +26,22 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI openApi() {
-        var openApi = new OpenAPI().info(new Info()
-                        .title("Identifier Registry Authoring Service")
-                        .description("APIs for the Identifier Registry Authoring Services")
-                        .version(buildProperties.getVersion()))
-                .addSecurityItem(new SecurityRequirement().addList("OIDC")) // OIDC schema is provided by jeap's SwaggerOauthConfiguration
-                .components(new Components());
+        var openApi = new OpenAPI()
+            .info(
+                new Info()
+                    .title("Identifier Registry Authoring Service")
+                    .description("IF-004 - APIs for the Identifier Registry Authoring Services")
+                    .version(buildProperties.getVersion())
+            )
+            .addSecurityItem(new SecurityRequirement().addList("OIDC")) // OIDC schema is provided by jeap's SwaggerOauthConfiguration
+            .components(new Components());
         addBearerAuthAsWorkaroundForOpenApiCodegen(openApi);
         return openApi;
     }
 
     @Bean
     GroupedOpenApi api() {
-        return GroupedOpenApi.builder()
-                .group("API")
-                .packagesToScan(Application.class.getPackageName())
-                .build();
+        return GroupedOpenApi.builder().group("API").packagesToScan(Application.class.getPackageName()).build();
     }
 
     /**
@@ -51,13 +51,17 @@ public class OpenApiConfig {
     private void addBearerAuthAsWorkaroundForOpenApiCodegen(OpenAPI openApi) {
         var name = "bearer-jwt";
         openApi.getSecurity().getFirst().addList(name);
-        openApi.getComponents().addSecuritySchemes(name, new SecurityScheme()
-                .name("bearerAuth")
-                .description("JWT authentication")
-                .bearerFormat("jwt")
-                .type(SecurityScheme.Type.HTTP)
-                .scheme("bearer")
-                .in(SecurityScheme.In.HEADER)
-        );
+        openApi
+            .getComponents()
+            .addSecuritySchemes(
+                name,
+                new SecurityScheme()
+                    .name("bearerAuth")
+                    .description("JWT authentication")
+                    .bearerFormat("jwt")
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .in(SecurityScheme.In.HEADER)
+            );
     }
 }

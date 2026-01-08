@@ -26,8 +26,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorDto> handleResourceNotFoundException(
-            final ResourceNotFoundException exception,
-            final HttpServletRequest request
+        final ResourceNotFoundException exception,
+        final HttpServletRequest request
     ) {
         var apiError = new ApiErrorDto(HttpStatus.NOT_FOUND, exception.getMessage());
         log.trace("Resource not found for URL {}", request.getRequestURI());
@@ -36,8 +36,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ResourceNotReadyException.class)
     public ResponseEntity<ApiErrorDto> handleResourceNotReadyException(
-            final ResourceNotReadyException exception,
-            final HttpServletRequest request
+        final ResourceNotReadyException exception,
+        final HttpServletRequest request
     ) {
         var apiError = new ApiErrorDto(HttpStatus.TOO_EARLY, exception.getMessage());
         log.trace("Resource not ready for URL {}", request.getRequestURI());

@@ -5,27 +5,24 @@
   ~ SPDX-License-Identifier: MIT
   -->
 
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ch.admin.bj.swiyu</groupId>
     <artifactId>swiyu-registry-identifier-authoring-service</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.13-SNAPSHOT</version>
 
     <parent>
         <groupId>ch.admin.bit.jeap</groupId>
         <artifactId>jeap-spring-boot-parent</artifactId>
         <!-- Attention when updating: always check if some overrides in CVE-OVERRIDES section can be removed  -->
-        <version>26.26.0</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>27.2.0</version>
+        <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
     <properties>
         <java.version>21</java.version>
         <!-- Sonar Config / Rules -->
-        <sonar.jacoco.itReportPath>${project.basedir}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
-        <sonar.jacoco.reportPath>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.exclusions>
             **/org/**/*.java, **/com/**/*.java
         </sonar.exclusions>
@@ -36,13 +33,15 @@
             **/*Dto.java,**/config/*,**/generated/*,**/*Exception.java,**/*Constants.java,**/*Registry.java,**/*Config.java,**/*Mock*,**/*Application.java
         </sonar.coverage.exclusions>
         <!-- Dependencies -->
-        <archunit-junit5.verion>1.4.0</archunit-junit5.verion>
+        <archunit-junit5.version>1.4.1</archunit-junit5.version>
         <!-- Plugins-->
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
-        <spotless.version>2.43.0</spotless.version>
+        <spotless-maven-plugin.version>3.0.0</spotless-maven-plugin.version>
+        <cleanthat.version>2.22</cleanthat.version>
+        <prettier.version>3.5.3</prettier.version>
+        <prettier-plugin-java.version>2.6.7</prettier-plugin-java.version>
         <git-build-hook.version>3.1.0</git-build-hook.version>
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-        <editorconfig-maven-plugin.version>0.1.3</editorconfig-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -53,6 +52,11 @@
         <dependency>
             <groupId>ch.admin.bit.jeap</groupId>
             <artifactId>jeap-spring-boot-security-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.admin.bit.jeap</groupId>
+            <artifactId>jeap-spring-boot-security-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ch.admin.bit.jeap</groupId>
@@ -111,14 +115,24 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
+            <version>${archunit-junit5.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.tngtech.archunit</groupId>
-            <artifactId>archunit-junit5</artifactId>
-            <version>${archunit-junit5.verion}</version>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -126,16 +140,21 @@
     <dependencyManagement>
         <dependencies>
             <!-- CVE-OVERRIDES Start -->
-            <dependency>
-                <groupId>net.minidev</groupId>
-                <artifactId>json-smart</artifactId>
-                <version>2.5.2</version>
-            </dependency>
             <!-- CVE-OVERRIDES End -->
         </dependencies>
     </dependencyManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <!-- Hotfix for archunit incompatibility: https://github.com/apache/maven-surefire/issues/839 -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.5.4</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -147,6 +166,17 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <skipTests>${skip.failsafe.tests}</skipTests>
+                    <systemPropertyVariables>
+                        <!-- Needed for CI pipeline in order to reduce the memory consumption -->
+                        <spring.test.context.cache.maxSize>5</spring.test.context.cache.maxSize>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <!-- See https://www.baeldung.com/checkstyle-java for more info -->
@@ -166,18 +196,67 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.ec4j.maven</groupId>
-                <artifactId>editorconfig-maven-plugin</artifactId>
-                <version>${editorconfig-maven-plugin.version}</version>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless-maven-plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>check</id>
-                        <phase>verify</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <upToDateChecking>
+                        <!--
+                            upToDateChecking creates a cache in the target directory to only reformat modified files — improves performance.
+                            Enabled by default since version 2.35.0, but explicitly set here so it can be temporarily disabled locally if merge issues occur.
+                        -->
+                        <enabled>true</enabled>
+                    </upToDateChecking>
+                    <java>
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                        </includes>
+                        <cleanthat>
+                            <version>${cleanthat.version}</version>
+                            <sourceJdk>${java.version}</sourceJdk>
+                            <mutators>
+                                <mutator>SafeAndConsensual</mutator>
+                                <mutator>SafeButNotConsensual</mutator>
+                            </mutators>
+                            <includeDraft>true</includeDraft>
+                            <excludedMutators>
+                                <excludedMutator>AvoidInlineConditionals</excludedMutator>
+                                <excludedMutator>ForEachAddToStreamCollectToCollection</excludedMutator>
+                                <excludedMutator>NullCheckToOptionalOfNullable</excludedMutator>
+                                <excludedMutator>GuavaMutators</excludedMutator>
+                                <excludedMutator>GuavaStringsIsNullOrEmpty</excludedMutator>
+                                <excludedMutator>LoopIntRangeToIntStreamForEach</excludedMutator>
+                                <excludedMutator>ForEachToIterableForEach</excludedMutator>
+                                <excludedMutator>StreamForEachNestingForLoopToFlatMap</excludedMutator>
+                                <excludedMutator>RemoveExplicitCallToSuper</excludedMutator>
+                            </excludedMutators>
+                        </cleanthat>
+                        <importOrder>
+                            <order>java,javax,com,de,lombok,net,org</order>
+                        </importOrder>
+                        <removeUnusedImports />
+                        <prettier>
+                            <devDependencies>
+                                <prettier>${prettier.version}</prettier>
+                                <prettier-plugin-java>${prettier-plugin-java.version}</prettier-plugin-java>
+                            </devDependencies>
+                            <config>
+                                <tabWidth>4</tabWidth>
+                                <parser>java</parser>
+                                <printWidth>120</printWidth>
+                                <plugins>prettier-plugin-java</plugins>
+                            </config>
+                        </prettier>
+                    </java>
+                </configuration>
             </plugin>
         </plugins>
     </build>

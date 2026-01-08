@@ -6,6 +6,11 @@
 
 package ch.admin.bj.swiyu.registry.identifier.authoring.service;
 
+import static ch.admin.bj.swiyu.registry.identifier.authoring.service.DatastoreEntityService.validateCanEdit;
+import static ch.admin.bj.swiyu.registry.identifier.authoring.service.mapper.DatastoreEntityMapper.toDatastoreEntityResponseDto;
+import static ch.admin.bj.swiyu.registry.identifier.authoring.service.mapper.DidEntityMapper.toNotConfiguredDidEntityResponseDto;
+import static java.util.stream.Collectors.toMap;
+
 import ch.admin.bj.swiyu.registry.identifier.authoring.api.DatastoreEntityRequestDto;
 import ch.admin.bj.swiyu.registry.identifier.authoring.api.DatastoreEntityResponseDto;
 import ch.admin.bj.swiyu.registry.identifier.authoring.api.DidEntityResponseDto;
@@ -16,19 +21,13 @@ import ch.admin.bj.swiyu.registry.identifier.authoring.domain.DidType;
 import ch.admin.bj.swiyu.registry.identifier.authoring.domain.datastore.DatastoreEntity;
 import ch.admin.bj.swiyu.registry.identifier.authoring.service.mapper.DidEntityMapper;
 import jakarta.validation.Valid;
+import java.text.MessageFormat;
+import java.util.Map;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.text.MessageFormat;
-import java.util.Map;
-import java.util.UUID;
-
-import static ch.admin.bj.swiyu.registry.identifier.authoring.service.DatastoreEntityService.validateCanEdit;
-import static ch.admin.bj.swiyu.registry.identifier.authoring.service.mapper.DatastoreEntityMapper.toDatastoreEntityResponseDto;
-import static ch.admin.bj.swiyu.registry.identifier.authoring.service.mapper.DidEntityMapper.toNotConfiguredDidEntityResponseDto;
-import static java.util.stream.Collectors.toMap;
 
 @Slf4j
 @Service
@@ -78,11 +77,7 @@ public class DidEntityService {
         return toDatastoreEntityResponseDto(datastoreEntity, didEntities);
     }
 
-    private DatastoreEntity saveNewDidAndActivateDatastore(
-            UUID datastoreEntityId,
-            DidType didType,
-            String content
-    ) {
+    private DatastoreEntity saveNewDidAndActivateDatastore(UUID datastoreEntityId, DidType didType, String content) {
         var datastoreEntity = datastoreEntityService.getDatastoreEntity(datastoreEntityId);
         validateCanEdit(datastoreEntity);
         var existing = didEntityRepository.findByBase_IdAndFileType(datastoreEntity.getId(), didType);
@@ -104,13 +99,10 @@ public class DidEntityService {
 
     private String createReadUri(UUID datastoreEntityId, DidType fileType) {
         return switch (fileType) {
-            case DID_WEB -> MessageFormat.format(
-                    this.didAuthoringProperties.getDidWebTemplate(),
-                    datastoreEntityId
-            );
+            case DID_WEB -> MessageFormat.format(this.didAuthoringProperties.getDidWebTemplate(), datastoreEntityId);
             case DID_TDW -> MessageFormat.format(
-                    this.didAuthoringProperties.getDidTdwRouteTemplate(),
-                    datastoreEntityId
+                this.didAuthoringProperties.getDidTdwRouteTemplate(),
+                datastoreEntityId
             );
         };
     }
@@ -118,8 +110,8 @@ public class DidEntityService {
     private Map<String, DidEntityResponseDto> getAllDatastoreDidEntities(UUID datastoreEntityId) {
         var didEntities = this.didEntityRepository.findByBase_Id(datastoreEntityId);
         var result = didEntities
-                .stream()
-                .collect(toMap(e -> e.getFileType().name(), DidEntityMapper::toDidEntityResponseDto));
+            .stream()
+            .collect(toMap(e -> e.getFileType().name(), DidEntityMapper::toDidEntityResponseDto));
         // add did entities for missing types
         for (DidType type : DidType.values()) {
             if (result.get(type.name()) == null) {

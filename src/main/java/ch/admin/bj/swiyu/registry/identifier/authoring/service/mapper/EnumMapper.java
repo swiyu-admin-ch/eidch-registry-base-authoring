@@ -6,11 +6,10 @@
 
 package ch.admin.bj.swiyu.registry.identifier.authoring.service.mapper;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
 import java.util.Collection;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * Utility class for mapping enums which do not differ between boundaries (1:1).
@@ -20,7 +19,7 @@ public class EnumMapper {
 
     public static <T extends Enum<T>, S extends Enum<S>> List<T> mapEnum(Class<T> enumType, Collection<S> source) {
         if (source == null) {
-            return null;
+            return null; // NOSONAR We explicitly want the null state as the source is also null
         }
         return source.stream().map(g -> mapEnum(enumType, g)).toList();
     }
